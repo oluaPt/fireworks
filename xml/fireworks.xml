@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<FireworkDisplay>
+
+     <Firework begin="300" type="Fountain" colour="0x0F22D4" duration="6000">
+       <Position x="-500" y="280"/>
+    </Firework>
+    <Firework begin="200" type="Fountain" colour="0x20FF40" duration="4000">
+       <Position x="-250" y="330"/>
+    </Firework>
+    <Firework begin="100" type="Fountain" colour="0xFF2020" duration="2000">
+       <Position x="0" y="380"/>
+    </Firework>
+    <Firework begin="200" type="Fountain" colour="0x20FF40" duration="4000">
+       <Position x="250" y="330"/>
+    </Firework>
+    <Firework begin="300" type="Fountain" colour="0x0F22D4" duration="6000">
+       <Position x="500" y="280"/>
+    </Firework>
+
+    <Firework begin="0" type="Rocket" colour="0xFF2020" duration="1500">
+        <Position x="-400" y="420"/>
+        <Velocity x="100" y="-300"/>
+    </Firework>
+    <Firework begin="500" type="Rocket" colour="0x20FF40" duration="2000">
+        <Position x="400" y="420"/>
+        <Velocity x="-100" y="-300"/>
+    </Firework>
+    <Firework begin="1000" type="Rocket" colour="0xA9B40A" duration="1500">
+        <Position x="-200" y="420"/>
+        <Velocity x="100" y="-280"/>
+    </Firework>
+    <Firework begin="1500" type="Rocket" colour="0x0F22D4" duration="2000">
+        <Position x="200" y="420"/>
+        <Velocity x="-150" y="-320"/>
+    </Firework>
+    <Firework begin="2000" type="Rocket" colour="0xA9B40A" duration="2000">
+        <Position x="-400" y="420"/>
+        <Velocity x="300" y="-300"/>
+    </Firework>
+    <Firework begin="5000" type="Rocket" colour="0xFF2020" duration="2000">
+        <Position x="0" y="300"/>
+        <Velocity x="0" y="-170"/>
+    </Firework>
+</FireworkDisplay>

@@ -1,0 +1,1 @@
+# Note: Please run this files on a web server due to CORS restrictions. Nothing else is necessary.
