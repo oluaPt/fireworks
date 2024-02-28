@@ -42,7 +42,6 @@ function createFireworks() {
 }
 
 function createRestartButton() {
-    console.log('ola');
     const restartButton = document.createElement("button");
     restartButton.textContent = "Restart Fireworks";
     restartButton.addEventListener("click", () => {
