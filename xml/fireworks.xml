@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
 <FireworkDisplay>
-
-     <Firework begin="300" type="Fountain" colour="0x0F22D4" duration="6000">
+    <Firework begin="300" type="Fountain" colour="0x0F22D4" duration="6000">
        <Position x="-500" y="280"/>
     </Firework>
     <Firework begin="200" type="Fountain" colour="0x20FF40" duration="4000">

@@ -2,44 +2,21 @@ import XmlLoader from "./app/xmlLoader.js";
 import Fountain from "./app/fountain.js";
 import Rocket from "./app/rocket.js";
 
+let app, container, fireworks;
+
 function startApp() {
-    const app = new PIXI.Application({ background: '#000000', width: 1024, height: 768 });
+    app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
     document.body.appendChild(app.view);
+    container = createContainer();
+    
+    new XmlLoader("xml/fireworks.xml").get()
+        .then(data => Array.isArray(fireworks = data) && createFireworks())
+        .catch(error => console.error("Error loading fireworks data:", error.message));
 
-    let container = createContainer(app);
-
-    const fireworksPromise = new XmlLoader("xml/fireworks.xml").get();
-
-    fireworksPromise.then((fireworks) => {
-        if (Array.isArray(fireworks)) {
-            createFireworks(container, fireworks);
-        } else {
-            console.error("Failed to load fireworks data. Ensure the XML file is valid.");
-        }
-    }).catch((error) => {
-        console.error("Error loading fireworks data:", error.message);
-    });
-
-    const restartButton = document.createElement("button");
-    restartButton.textContent = "Restart Fireworks";
-    restartButton.addEventListener("click", () => {
-        app.stage.removeChild(container);
-        container = createContainer(app);
-        fireworksPromise.then((fireworks) => {
-            if (Array.isArray(fireworks)) {
-                createFireworks(container, fireworks);
-            } else {
-                console.error("Failed to load fireworks data during restart. Ensure the XML file is valid.");
-            }
-        }).catch((error) => {
-            console.error("Error loading fireworks data during restart:", error.message);
-        });
-    });
-
-    document.body.appendChild(restartButton);
+    document.body.appendChild(createRestartButton());
 }
 
-function createContainer(app) {
+function createContainer() {
     const container = new PIXI.Container();
     container.position.set(app.screen.width / 2, app.screen.height / 2);
     container.pivot.set(container.width / 2, container.height / 2);
@@ -47,20 +24,23 @@ function createContainer(app) {
     return container;
 }
 
-function createFireworks(container, fireworks) {
-    fireworks.forEach((firework) => {
+function createFireworks() {
+    fireworks.forEach(firework => {
         try {
-            if (firework.type === "Fountain") {
-                new Fountain(container, firework).create();
-            } else if (firework.type === "Rocket") {
-                new Rocket(container, firework).create();
-            } else {
-                console.warn("Unknown firework type:", firework.type);
-            }
+            if (firework.type === "Fountain") new Fountain(container, firework).create();
+            else if (firework.type === "Rocket") new Rocket(container, firework).create();
+            else console.warn("Unknown firework type:", firework.type);
         } catch (error) {
             console.error("Error creating firework:", error.message);
         }
     });
+}
+
+function createRestartButton() {
+    const restartButton = document.createElement("button");
+    restartButton.textContent = "Restart Fireworks";
+    restartButton.addEventListener("click", () => (app.stage.removeChildren(), container = createContainer(), createFireworks()));
+    return restartButton;
 }
 
 document.addEventListener("DOMContentLoaded", startApp);
