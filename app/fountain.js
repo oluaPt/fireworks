@@ -57,9 +57,8 @@ export default class Fountain {
             
             if (currentTime >= startTime) {
 
-                emitter.update(1);
-
                 const elapsedTime = currentTime - startTime;
+                emitter.update((1 - (elapsedTime * 0.0001)) > 0.5 ? (1 - (elapsedTime * 0.0001)) : 0.5);
 
                 if (elapsedTime >= duration) {
                     emitter.emit = false;
