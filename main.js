@@ -10,10 +10,14 @@ function startApp() {
     container = createContainer();
 
     XmlLoader.load("xml/fireworks.xml")
-        .then(data => Array.isArray(fireworks = data) && createFireworks())
-        .catch(error => console.error("Error loading fireworks data:", error.message));
-
-    document.body.appendChild(createRestartButton());
+    .then(data => {
+        if (Array.isArray(data)) {
+            fireworks = data;
+            createFireworks();
+            createRestartButton();
+        }
+    })
+    .catch(error => console.error("Error loading fireworks data:", error.message));
 }
 
 function createContainer() {
@@ -38,6 +42,7 @@ function createFireworks() {
 }
 
 function createRestartButton() {
+    console.log('ola');
     const restartButton = document.createElement("button");
     restartButton.textContent = "Restart Fireworks";
     restartButton.addEventListener("click", () => {
@@ -45,7 +50,7 @@ function createRestartButton() {
         container = createContainer();
         createFireworks();
     });
-    return restartButton;
+    document.body.appendChild(restartButton);
 }
 
 document.addEventListener("DOMContentLoaded", startApp);
