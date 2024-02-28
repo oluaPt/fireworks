@@ -55,6 +55,22 @@ export default class Rocket {
         }
     }
 
+    createRocketParticle(x, y) {
+        const particle = PIXI.Sprite.from('./assets/rocket.png');
+        particle.anchor.set(0.5);
+        particle.x = x;
+        particle.y = y;
+        particle.initialX = x;
+        particle.initialY = y;
+        particle.height = 50;
+        particle.width = 50;
+        particle.tint = this.fireworkConfig.colour;
+        particle.alpha = 0;
+        particle.blur = 0;
+
+        return particle;
+    }
+
     createStartAnimation(particle, duration, velocityX, velocityY) {
         return () => {
             this.container.addChild(particle);
@@ -102,22 +118,6 @@ export default class Rocket {
         };
 
         update();
-    }
-
-    createRocketParticle(x, y) {
-        const particle = PIXI.Sprite.from('./assets/rocket.png');
-        particle.anchor.set(0.5);
-        particle.x = x;
-        particle.y = y;
-        particle.initialX = x;
-        particle.initialY = y;
-        particle.height = 50;
-        particle.width = 50;
-        particle.tint = this.fireworkConfig.colour;
-        particle.alpha = 0;
-        particle.blur = 0;
-
-        return particle;
     }
 
     createEmitterConfig(x, y) {
