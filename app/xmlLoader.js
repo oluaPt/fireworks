@@ -1,8 +1,4 @@
 export default class XmlLoader {
-    constructor() {
-        if (!window.XMLHttpRequest) throw new Error("XMLHttpRequest is not available. This browser may not support the XmlLoader class.");
-    }
-
     static async load(url) {
         try {
             const response = await fetch(url);
