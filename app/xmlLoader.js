@@ -1,13 +1,20 @@
 export default class XmlLoader {
+    constructor() {
+        if (!window.XMLHttpRequest) throw new Error("XMLHttpRequest is not available. This browser may not support the XmlLoader class.");
+    }
+
     static async load(url) {
         try {
             const response = await fetch(url);
+
             if (!response.ok) {
                 throw new Error(`Fetch failed with status ${response.status}`);
             }
+
             const data = await response.text();
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(data, "text/xml");
+
             return Array.from(xmlDoc?.querySelectorAll("FireworkDisplay")?.[0]?.children || []).map(child => this.parseFirework(child));
         } catch (error) {
             console.error("Error loading XML:", error.message);

@@ -4,26 +4,17 @@ import Rocket from "./app/rocket.js";
 
 let app, container, fireworks;
 
-function startApp() {
+async function startApp() {
     app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
     document.body.appendChild(app.view);
     container = createContainer();
 
-    loadFireworksData()
-        .then(() => createFireworks())
-        .then(() => createRestartButton())
-        .catch(error => console.error("Error loading fireworks data:", error.message));
-}
-
-async function loadFireworksData() {
     try {
-        const data = await XmlLoader.load("xml/fireworks.xml");
-        if (Array.isArray(data)) {
-            fireworks = data;
-        }
+        fireworks = await XmlLoader.load("xml/fireworks.xml");
+        createFireworks();
+        createRestartButton();
     } catch (error) {
         console.error("Error loading fireworks data:", error.message);
-        throw error; // Propagate the error for global error handling, if needed.
     }
 }
 

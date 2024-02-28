@@ -72,7 +72,7 @@ export default class Rocket {
     createStartAnimation(particle, duration, velocityX, velocityY) {
         return () => {
             this.container.addChild(particle);
-            const startTime = Date.now();
+            let startTime = Date.now();
 
             this.ticker.add(() => {
                 const currentTime = Date.now();
