@@ -54,11 +54,12 @@ export default class Fountain {
             requestAnimationFrame(update);
 
             const currentTime = Date.now();
-
+            
             if (currentTime >= startTime) {
-                const elapsedTime = currentTime - startTime;
 
-                emitter.update(elapsedTime * 0.001);
+                emitter.update(1);
+
+                const elapsedTime = currentTime - startTime;
 
                 if (elapsedTime >= duration) {
                     emitter.emit = false;
@@ -71,21 +72,21 @@ export default class Fountain {
 
     createEmitterConfig(x, y, colour) {
         return {
-            lifetime: { min: 0, max: 0.4 },
-            frequency: 0.001,
-            spawnChance: 0.8,
-            particlesPerWave: 1,
-            maxParticles: 200,
+            lifetime: { min: 3, max: 18 },
+            frequency: 0.005,
+            spawnChance: 5,
+            particlesPerWave: 10,
+            maxParticles: 150,
             pos: { x, y },
-            addAtBack: true,
+            addAtBack: false,
             behaviors: [
-                { type: 'alpha', config: { alpha: { list: [{ value: 0.8, time: 0 }, { value: 0.5, time: 1 }] } } },
-                { type: 'scale', config: { scale: { list: [{ value: 0.1, time: 0 }, { value: 0.6, time: 1 }] } } },
-                { type: 'color', config: { color: { list: [{ value: '#ffffff', time: 0 }, { value: colour, time: 1 }] } } },
-                { type: 'moveSpeed', config: { speed: { list: [{ value: 500, time: 0 }, { value: 300, time: 1 }], isStepped: false } } },
-                { type: 'rotationStatic', config: { min: -120, max: -60 } },
-                { type: 'spawnShape', config: { type: 'circle', data: { x: 0, y: 0, radius: 5 } } },
-                { type: 'textureSingle', config: { texture: PIXI.Texture.from('./assets/particle.png') } }
+                { type: 'alpha', config: { alpha: { list: [{ value: 1, time: 0 }, { value: 0.8, time: 0.5 }, { value: 0.3, time: 1 }] } } },
+                { type: 'scale', config: { scale: { list: [{ value: 0.3, time: 0 }, { value: 1, time: 1 }] } } },
+                { type: 'color', config: { color: { list: [{ value: '#ffffff', time: 0.3 }, { value: colour, time: 1 }] } } },
+                { type: 'moveSpeed', config: { speed: { list: [{ value: 10, time: 0 }, { value: 15, time: 1 }], isStepped: false }, minMult: 0.2 } },
+                { type: 'rotationStatic', config: { min: -110, max: -70 } },
+                { type: 'spawnShape', config: { type: 'circle', data: { x: 0, y: 0, radius: 0 } } },
+                { type: 'textureSingle', config: { texture: PIXI.Texture.from('./assets/particle.png') } },
             ]
         };
     }
