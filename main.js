@@ -3,6 +3,7 @@ import Fountain from "./app/fountain.js";
 import Rocket from "./app/rocket.js";
 
 let app, container, fireworks;
+let appStarted = false;
 
 async function startApp() {
     app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
@@ -50,4 +51,13 @@ function createRestartButton() {
     document.body.appendChild(restartButton);
 }
 
-document.addEventListener("DOMContentLoaded", startApp);
+const handleVisibilityChange = () => {
+    if (!appStarted && document.visibilityState === "visible" && (appStarted = true)) {
+        startApp();
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+    }
+};
+
+["visibilitychange", "DOMContentLoaded"].forEach(event =>
+    document.addEventListener(event, handleVisibilityChange)
+);
