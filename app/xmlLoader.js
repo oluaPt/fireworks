@@ -1,36 +1,30 @@
 export default class XmlLoader {
-    constructor(url, method = "GET") {
-        if (!window.XMLHttpRequest) throw new Error("XMLHttpRequest is not available. This browser may not support the XmlLoader class.");
-        this.url = url;
-        this.method = method;
+    static load(url) {
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Fetch failed with status ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(data, "text/xml");
+                return Array.from(xmlDoc?.querySelectorAll("FireworkDisplay")?.[0]?.children || []).map(child => this.parseFirework(child));
+            })
+            .catch(error => {
+                console.error("Error loading XML:", error.message);
+                throw error;
+            });
     }
 
-    async get() {
-        try {
-            const xmlDoc = await this.request();
-            return Array.from(xmlDoc?.querySelectorAll("FireworkDisplay")?.[0]?.children || []).map(child => this.parseFirework(child));
-        } catch (error) {
-            console.error("Error loading XML:", error.message);
-            throw error;
-        }
-    }
-
-    async request() {
-        return new Promise((resolve, reject) => {
-            const xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = () => xhttp.readyState === 4 && (xhttp.status === 200 ? resolve(xhttp.responseXML) : reject(new Error(`XMLHttpRequest failed with status ${xhttp.status}`)));
-            xhttp.open(this.method, this.url, true);
-            xhttp.send();
-        });
-    }
-
-    parseFirework(child) {
+    static parseFirework(child) {
         const parseNumberAttribute = (element, attributeName, defaultValue) => {
             const value = Number(element?.getAttribute(attributeName)) || defaultValue;
             return isNaN(value) ? defaultValue : value;
         };
 
-        const firework = {
+        return {
             type: child.getAttribute("type") || "",
             begin: parseNumberAttribute(child, "begin", 0),
             colour: child.getAttribute("colour") || "",
@@ -46,7 +40,5 @@ export default class XmlLoader {
                 },
             }),
         };
-
-        return firework;
     }
 }

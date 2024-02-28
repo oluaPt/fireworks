@@ -8,8 +8,8 @@ function startApp() {
     app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
     document.body.appendChild(app.view);
     container = createContainer();
-    
-    new XmlLoader("xml/fireworks.xml").get()
+
+    XmlLoader.load("xml/fireworks.xml")
         .then(data => Array.isArray(fireworks = data) && createFireworks())
         .catch(error => console.error("Error loading fireworks data:", error.message));
 
@@ -27,8 +27,9 @@ function createContainer() {
 function createFireworks() {
     fireworks.forEach(firework => {
         try {
-            if (firework.type === "Fountain") new Fountain(container, firework).create();
-            else if (firework.type === "Rocket") new Rocket(container, firework).create();
+            const FireworkClass = firework.type === "Fountain" ? Fountain : firework.type === "Rocket" ? Rocket : null;
+
+            if (FireworkClass) new FireworkClass(container, firework).create();
             else console.warn("Unknown firework type:", firework.type);
         } catch (error) {
             console.error("Error creating firework:", error.message);
@@ -39,7 +40,11 @@ function createFireworks() {
 function createRestartButton() {
     const restartButton = document.createElement("button");
     restartButton.textContent = "Restart Fireworks";
-    restartButton.addEventListener("click", () => (app.stage.removeChildren(), container = createContainer(), createFireworks()));
+    restartButton.addEventListener("click", () => {
+        app.stage.removeChildren();
+        container = createContainer();
+        createFireworks();
+    });
     return restartButton;
 }
 

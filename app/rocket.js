@@ -5,7 +5,6 @@ export default class Rocket {
         this.container = container;
         this.fireworkConfig = fireworkConfig;
         this.ticker = new PIXI.Ticker();
-        this.particleEmitter = null;
     }
 
     static validateNumericValue(value, paramName) {
@@ -58,8 +57,7 @@ export default class Rocket {
     createRocketParticle(x, y) {
         const particle = PIXI.Sprite.from('./assets/rocket.png');
         particle.anchor.set(0.5);
-        particle.x = x;
-        particle.y = y;
+        particle.position.set(x, y);
         particle.initialX = x;
         particle.initialY = y;
         particle.height = 50;
@@ -74,7 +72,7 @@ export default class Rocket {
     createStartAnimation(particle, duration, velocityX, velocityY) {
         return () => {
             this.container.addChild(particle);
-            let startTime = Date.now();
+            const startTime = Date.now();
 
             this.ticker.add(() => {
                 const currentTime = Date.now();
@@ -85,8 +83,7 @@ export default class Rocket {
                     const distanceX = velocityX * progress * (elapsedTime / 1000);
                     const distanceY = velocityY * progress * (elapsedTime / 1000);
 
-                    particle.x = particle.initialX + distanceX;
-                    particle.y = particle.initialY + distanceY;
+                    particle.position.set(particle.initialX + distanceX, particle.initialY + distanceY);
                     particle.alpha = progress;
                     particle.blur = progress;
                 } else {
@@ -94,7 +91,7 @@ export default class Rocket {
 
                     this.container.removeChild(particle);
 
-                    this.startParticleEffect(particle.x, particle.y);
+                    this.startParticleEffect(particle.position.x, particle.position.y);
                 }
             });
 
