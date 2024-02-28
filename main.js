@@ -9,15 +9,22 @@ function startApp() {
     document.body.appendChild(app.view);
     container = createContainer();
 
-    XmlLoader.load("xml/fireworks.xml")
-    .then(data => {
+    loadFireworksData()
+        .then(() => createFireworks())
+        .then(() => createRestartButton())
+        .catch(error => console.error("Error loading fireworks data:", error.message));
+}
+
+async function loadFireworksData() {
+    try {
+        const data = await XmlLoader.load("xml/fireworks.xml");
         if (Array.isArray(data)) {
             fireworks = data;
-            createFireworks();
-            createRestartButton();
         }
-    })
-    .catch(error => console.error("Error loading fireworks data:", error.message));
+    } catch (error) {
+        console.error("Error loading fireworks data:", error.message);
+        throw error; // Propagate the error for global error handling, if needed.
+    }
 }
 
 function createContainer() {

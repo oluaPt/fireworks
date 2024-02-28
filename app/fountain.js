@@ -50,7 +50,7 @@ export default class Fountain {
     startParticleEffect(emitter, begin, duration) {
         const startTime = Date.now() + begin;
 
-        function update() {
+        const update = () => {
             requestAnimationFrame(update);
 
             const currentTime = Date.now();
@@ -64,7 +64,7 @@ export default class Fountain {
                     emitter.emit = false;
                 }
             }
-        }
+        };
 
         update();
     }

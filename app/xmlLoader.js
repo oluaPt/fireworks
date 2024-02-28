@@ -1,21 +1,18 @@
 export default class XmlLoader {
-    static load(url) {
-        return fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Fetch failed with status ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(data => {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(data, "text/xml");
-                return Array.from(xmlDoc?.querySelectorAll("FireworkDisplay")?.[0]?.children || []).map(child => this.parseFirework(child));
-            })
-            .catch(error => {
-                console.error("Error loading XML:", error.message);
-                throw error;
-            });
+    static async load(url) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Fetch failed with status ${response.status}`);
+            }
+            const data = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(data, "text/xml");
+            return Array.from(xmlDoc?.querySelectorAll("FireworkDisplay")?.[0]?.children || []).map(child => this.parseFirework(child));
+        } catch (error) {
+            console.error("Error loading XML:", error.message);
+            throw error;
+        }
     }
 
     static parseFirework(child) {
