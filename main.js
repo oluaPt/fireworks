@@ -3,14 +3,23 @@ import Fountain from "./app/fountain.js";
 import Rocket from "./app/rocket.js";
 
 let app, container, fireworksInstances = [], totalDuration, restartTime = 2000;
-let frameCounter, frameCount = 0, lastFrameTime = Date.now();
+let frameCounter, memoryCounter;
+let frameCount = 0, lastFrameTime = Date.now();
 
 async function startApp() {
     app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
     document.body.appendChild(app.view);
     container = createContainer();
-    // uncomment to show frames counter
-    // createCounter();
+
+    // uncomment to create counters
+    /*
+    frameCounter = createCounter("FPS", "10px", "0px");
+    memoryCounter = createCounter("Memory (MB)", "30px", "0px");
+    app.ticker.add(() => {
+        updateCounters();
+    });
+    */
+
     try {
         const fireworksData = await XmlLoader.load("xml/fireworks.xml");
         totalDuration = createFireworks(fireworksData);
@@ -26,31 +35,6 @@ function createContainer() {
     container.pivot.set(container.width / 2, container.height / 2);
     app.stage.addChild(container);
     return container;
-}
-
-function createCounter() {
-    frameCounter = document.createElement("div");
-    frameCounter.style.position = "absolute";
-    frameCounter.style.top = "10px";
-    frameCounter.style.left = "10px";
-    frameCounter.style.color = "white";
-    document.body.appendChild(frameCounter);
-
-    function updateFrameCounter() {
-        const now = Date.now();
-        const deltaTime = now - lastFrameTime;
-        lastFrameTime = now;
-        const fps = 1000 / deltaTime;
-    
-        frameCount++;
-        if (frameCount % 10 === 0) {
-            frameCounter.textContent = `FPS: ${fps.toFixed(2)}`;
-        }
-    }
-
-    app.ticker.add(() => {
-        updateFrameCounter();
-    });
 }
 
 function createFireworks(fireworksData) {
@@ -86,6 +70,40 @@ function restartFireworks() {
     });
 
     setTimeout(restartFireworks, totalDuration + restartTime);
+}
+
+function createCounter(label, top, left) {
+    const counter = document.createElement("div");
+    counter.style.position = "absolute";
+    counter.style.top = top;
+    counter.style.left = left;
+    counter.style.color = "white";
+    counter.textContent = `${label}: 0`;
+    document.body.appendChild(counter);
+    return counter;
+}
+
+function updateCounters() {
+    updateFrameCounter();
+    updateMemoryCounter();
+}
+
+function updateFrameCounter() {
+    const now = Date.now();
+    const deltaTime = now - lastFrameTime;
+    lastFrameTime = now;
+    const fps = 1000 / deltaTime;
+
+    frameCount++;
+    if (frameCount % 10 === 0) {
+        frameCounter.textContent = `FPS: ${fps.toFixed(2)}`;
+    }
+}
+
+
+function updateMemoryCounter() {
+    const memoryUsageMB = (window.performance.memory.usedJSHeapSize / (1024 * 1024)).toFixed(2);
+    memoryCounter.textContent = `Memory (MB): ${memoryUsageMB}`;
 }
 
 document.addEventListener("DOMContentLoaded", startApp);
