@@ -1,97 +1,104 @@
 import XmlLoader from "./app/xmlLoader.js";
 import FireworkFactory from './app/fireworkFactory.js';
 
-let app, container, fireworksInstances = [], totalDuration, restartTime = 2000;
-let frameCounter, memoryCounter;
-let frameCount = 0, lastFrameTime = Date.now();
+export default class MainApp {
+    constructor() {
+        this.app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
+        document.body.appendChild(this.app.view);
 
-async function startApp() {
-    app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
-    document.body.appendChild(app.view);
-    container = createContainer();
-    // createCounters();
+        this.container = this.createContainer();
+        this.fireworksInstances = [];
+        this.totalDuration = 0;
+        this.restartTime = 2000;
 
-    try {
-        const fireworksData = await XmlLoader.load("xml/fireworks.xml");
-        totalDuration = createFireworks(fireworksData);
-        setTimeout(restartFireworks, totalDuration + restartTime);
-    } catch (error) {
-        console.error("Error loading fireworks data:", error.message);
+        this.frameCounter = this.createCounter("FPS", "10px", "0px");
+        this.memoryCounter = this.createCounter("Memory (MB)", "30px", "0px");
+
+        this.frameCount = 0;
+        this.lastFrameTime = Date.now();
+
+        this.app.ticker.add(() => {
+            this.updateFrameCounter();
+            this.updateMemoryCounter();
+        });
+
+        document.addEventListener("DOMContentLoaded", () => this.startApp());
     }
-}
 
-function createFireworks(fireworksData) {
-    let longestDuration = 0;
-
-    fireworksData.forEach(fireworkData => {
+    async startApp() {
         try {
-            const fireworkInstance = FireworkFactory.createFirework(container, fireworkData);
-            fireworkInstance.create();
-            fireworksInstances.push({ instance: fireworkInstance });
-
-            const fireworkEndTime = fireworkData.begin + fireworkData.duration;
-            if (fireworkEndTime > longestDuration) {
-                longestDuration = fireworkEndTime;
-            }
+            const fireworksData = await XmlLoader.load("xml/fireworks.xml");
+            this.totalDuration = this.createFireworks(fireworksData);
+            setTimeout(() => this.restartFireworks(), this.totalDuration + this.restartTime);
         } catch (error) {
-            console.error("Error creating firework:", error.message);
+            console.error("Error loading fireworks data:", error.message);
         }
-    });
+    }
 
-    return longestDuration;
-}
+    createFireworks(fireworksData) {
+        let longestDuration = 0;
 
-function restartFireworks() {
-    fireworksInstances.forEach(({ instance }) => {
-        instance.restart();
-    });
+        fireworksData.forEach(fireworkData => {
+            try {
+                const fireworkInstance = FireworkFactory.createFirework(this.container, fireworkData);
+                fireworkInstance.create();
+                this.fireworksInstances.push({ instance: fireworkInstance });
 
-    setTimeout(restartFireworks, totalDuration + restartTime);
-}
+                const fireworkEndTime = fireworkData.begin + fireworkData.duration;
+                if (fireworkEndTime > longestDuration) {
+                    longestDuration = fireworkEndTime;
+                }
+            } catch (error) {
+                console.error("Error creating firework:", error.message);
+            }
+        });
 
-function createContainer() {
-    const container = new PIXI.Container();
-    container.position.set(app.screen.width / 2, app.screen.height / 2);
-    container.pivot.set(container.width / 2, container.height / 2);
-    app.stage.addChild(container);
-    return container;
-}
+        return longestDuration;
+    }
 
-function createCounters() {
-    frameCounter = createCounter("FPS", "10px", "0px");
-    memoryCounter = createCounter("Memory (MB)", "30px", "0px");
-    app.ticker.add(() => {
-        updateFrameCounter();
-        updateMemoryCounter();
-    });
-}
+    restartFireworks() {
+        this.fireworksInstances.forEach(({ instance }) => {
+            instance.restart();
+        });
 
-function createCounter(label, top, left) {
-    const counter = document.createElement("div");
-    counter.style.position = "absolute";
-    counter.style.top = top;
-    counter.style.left = left;
-    counter.style.color = "white";
-    counter.textContent = `${label}: 0`;
-    document.body.appendChild(counter);
-    return counter;
-}
+        setTimeout(() => this.restartFireworks(), this.totalDuration + this.restartTime);
+    }
 
-function updateFrameCounter() {
-    const now = Date.now();
-    const deltaTime = now - lastFrameTime;
-    lastFrameTime = now;
-    const fps = 1000 / deltaTime;
+    createContainer() {
+        const container = new PIXI.Container();
+        container.position.set(this.app.screen.width / 2, this.app.screen.height / 2);
+        container.pivot.set(container.width / 2, container.height / 2);
+        this.app.stage.addChild(container);
+        return container;
+    }
 
-    frameCount++;
-    if (frameCount % 10 === 0) {
-        frameCounter.textContent = `FPS: ${fps.toFixed(2)}`;
+    createCounter(label, top, left) {
+        const counter = document.createElement("div");
+        counter.style.position = "absolute";
+        counter.style.top = top;
+        counter.style.left = left;
+        counter.style.color = "white";
+        counter.textContent = `${label}: 0`;
+        document.body.appendChild(counter);
+        return counter;
+    }
+
+    updateFrameCounter() {
+        const now = Date.now();
+        const deltaTime = now - this.lastFrameTime;
+        this.lastFrameTime = now;
+        const fps = 1000 / deltaTime;
+
+        this.frameCount++;
+        if (this.frameCount % 10 === 0) {
+            this.frameCounter.textContent = `FPS: ${fps.toFixed(2)}`;
+        }
+    }
+
+    updateMemoryCounter() {
+        const memoryUsageMB = (window.performance.memory.usedJSHeapSize / (1024 * 1024)).toFixed(2);
+        this.memoryCounter.textContent = `Memory (MB): ${memoryUsageMB}`;
     }
 }
 
-function updateMemoryCounter() {
-    const memoryUsageMB = (window.performance.memory.usedJSHeapSize / (1024 * 1024)).toFixed(2);
-    memoryCounter.textContent = `Memory (MB): ${memoryUsageMB}`;
-}
-
-document.addEventListener("DOMContentLoaded", startApp);
+new MainApp();
