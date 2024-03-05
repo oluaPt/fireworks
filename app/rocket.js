@@ -5,6 +5,11 @@ export default class Rocket {
         this.container = container;
         this.fireworkConfig = fireworkConfig;
         this.ticker = new PIXI.Ticker();
+        this.firstAnimation = true;
+        this.animationCompleted = false;
+        this.emitter = null;
+        this.startAnimation = null;
+        this.startTime = Date.now() + fireworkConfig.begin;
     }
 
     static validateNumericValue(value, paramName) {
@@ -42,12 +47,13 @@ export default class Rocket {
             this.validateNumericValues(duration, initialX, initialY, velocityX, velocityY);
 
             const particle = this.createRocketParticle(initialX, initialY);
-            const startAnimation = this.createStartAnimation(particle, duration, velocityX, velocityY);
+            this.container.addChild(particle);
+            this.startAnimation = this.createStartAnimation(particle, duration, velocityX, velocityY);
 
             if (begin > 0) {
-                setTimeout(startAnimation, begin);
+                setTimeout( this.startAnimation, begin);
             } else {
-                startAnimation();
+                this.startAnimation();
             }
         } catch (error) {
             console.error("Error creating rocket:", error.message);
@@ -71,12 +77,11 @@ export default class Rocket {
 
     createStartAnimation(particle, duration, velocityX, velocityY) {
         return () => {
-            this.container.addChild(particle);
-            let startTime = Date.now();
+            this.startTime = Date.now();
 
             this.ticker.add(() => {
                 const currentTime = Date.now();
-                const elapsedTime = currentTime - startTime;
+                const elapsedTime = currentTime - this.startTime;
 
                 if (elapsedTime < duration) {
                     const progress = elapsedTime / duration;
@@ -88,10 +93,21 @@ export default class Rocket {
                     particle.blur = progress;
                 } else {
                     this.ticker.stop();
+                    particle.alpha = 0;
 
-                    this.container.removeChild(particle);
-
-                    this.startParticleEffect(particle.position.x, particle.position.y);
+                    if(!this.animationCompleted) {
+                        if(this.firstAnimation) {
+                            let positionX = this.fireworkConfig.position.x + (this.fireworkConfig.velocity.x * (this.fireworkConfig.duration*0.001));
+                            let positionY = this.fireworkConfig.position.y + this.fireworkConfig.velocity.y * (this.fireworkConfig.duration*0.001);
+    
+                            this.startParticleEffect(positionX, positionY);
+                            this.firstAnimation = false;
+                        } else {
+                            this.emitter.playOnce();
+                        }
+                        this.animationCompleted = true;
+                    }
+                    
                 }
             });
 
@@ -101,17 +117,17 @@ export default class Rocket {
 
     startParticleEffect(x, y) {
         const emitterConfig = this.createEmitterConfig(x, y);
-        const emitter = new PIXI.particles.Emitter(this.container, emitterConfig);
+        this.emitter = new PIXI.particles.Emitter(this.container, emitterConfig);
 
-        let startTime = Date.now();
+        let startTimeEffect = Date.now();
 
         const update = () => {
             requestAnimationFrame(update);
 
             const now = Date.now();
 
-            emitter.update((now - startTime) * 0.001);
-            startTime = now;
+            this.emitter.update((now - startTimeEffect) * 0.001);
+            startTimeEffect = now;
         };
 
         update();
@@ -128,8 +144,8 @@ export default class Rocket {
             pos: { x, y },
             addAtBack: true,
             behaviors: [
-                { type: 'alpha', config: { alpha: { list: [{ value: 0.8, time: 0 }, { value: 0.5, time: 1 }] } } },
-                { type: 'scale', config: { scale: { list: [{ value: 0.5, time: 0 }, { value: 0.6, time: 1 }] } } },
+                { type: 'alpha', config: { alpha: { list: [{ value: 0.8, time: 0 }, { value: 0.3, time: 1 }] } } },
+                { type: 'scale', config: { scale: { list: [{ value: 0.2, time: 0 }, { value: 0.6, time: 1 }] } } },
                 { type: 'color', config: { color: { list: [{ value: '#ffffff', time: 0 }, { value: this.fireworkConfig.colour, time: 1 }] } } },
                 { type: 'moveSpeed', config: { speed: { list: [{ value: 500, time: 0 }, { value: 300, time: 1 }], isStepped: false } } },
                 { type: 'rotationStatic', config: { min: 0, max: 360 } },
@@ -137,5 +153,15 @@ export default class Rocket {
                 { type: 'textureSingle', config: { texture: PIXI.Texture.from('./assets/particle.png') } }
             ],
         };
+    }
+
+    restart() {
+        try {
+            this.startTime = Date.now() + this.fireworkConfig.begin;
+            this.animationCompleted = false;
+            setTimeout( this.startAnimation, this.fireworkConfig.begin);
+        } catch (error) {
+            console.error("Error restarting rocket:", error.message);
+        }
     }
 }

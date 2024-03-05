@@ -2,17 +2,18 @@ import XmlLoader from "./app/xmlLoader.js";
 import Fountain from "./app/fountain.js";
 import Rocket from "./app/rocket.js";
 
-let app, container, fireworks;
+let app, container, fireworksInstances, totalDuration, restartTime = 2000;
 
 async function startApp() {
     app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
     document.body.appendChild(app.view);
     container = createContainer();
+    fireworksInstances = [];
 
     try {
-        fireworks = await XmlLoader.load("xml/fireworks.xml");
-        createFireworks();
-        createRestartButton();
+        const fireworksData = await XmlLoader.load("xml/fireworks.xml");
+        totalDuration = createFireworks(fireworksData);
+        setTimeout(restartFireworks, totalDuration + restartTime);
     } catch (error) {
         console.error("Error loading fireworks data:", error.message);
     }
@@ -26,28 +27,40 @@ function createContainer() {
     return container;
 }
 
-function createFireworks() {
-    fireworks.forEach(firework => {
-        try {
-            const FireworkClass = firework.type === "Fountain" ? Fountain : firework.type === "Rocket" ? Rocket : null;
+function createFireworks(fireworksData) {
+    let longestDuration = 0;
 
-            if (FireworkClass) new FireworkClass(container, firework).create();
-            else console.warn("Unknown firework type:", firework.type);
+    fireworksData.forEach(fireworkData => {
+        try {
+            const FireworkClass = fireworkData.type === "Fountain" ? Fountain : fireworkData.type === "Rocket" ? Rocket : null;
+
+            if (FireworkClass) {
+                const fireworkInstance = new FireworkClass(container, fireworkData);
+                const fireworkEndTime = fireworkData.begin + fireworkData.duration;
+
+                if (fireworkEndTime > longestDuration) {
+                    longestDuration = fireworkEndTime;
+                }
+
+                fireworkInstance.create();
+                fireworksInstances.push({ instance: fireworkInstance, config: fireworkData });
+            } else {
+                console.warn("Unknown firework type:", fireworkData.type);
+            }
         } catch (error) {
             console.error("Error creating firework:", error.message);
         }
     });
+
+    return longestDuration;
 }
 
-function createRestartButton() {
-    const restartButton = document.createElement("button");
-    restartButton.textContent = "Restart Fireworks";
-    restartButton.addEventListener("click", () => {
-        app.stage.removeChildren();
-        container = createContainer();
-        createFireworks();
+function restartFireworks() {
+    fireworksInstances.forEach(({ instance }) => {
+        instance.restart();
     });
-    document.body.appendChild(restartButton);
+
+    setTimeout(restartFireworks, totalDuration + restartTime);
 }
 
 document.addEventListener("DOMContentLoaded", startApp);

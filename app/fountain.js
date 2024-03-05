@@ -4,6 +4,8 @@ export default class Fountain {
         this.checkPixiAvailability();
         this.container = container;
         this.fireworkConfig = fireworkConfig;
+        this.emitter = null;
+        this.startTime = Date.now() + fireworkConfig.begin;
     }
 
     static validateNumericValue(value, paramName) {
@@ -24,7 +26,9 @@ export default class Fountain {
         }
     }
 
-    validateNumericValues(begin, duration, x, y) {
+    validateNumericValues() {
+        const { begin, duration, position: { x, y } } = this.fireworkConfig;
+
         Fountain.validateNumericValue(begin, 'begin');
         Fountain.validateNumericValue(duration, 'duration');
         Fountain.validateNumericValue(x, 'position.x');
@@ -33,36 +37,28 @@ export default class Fountain {
 
     create() {
         try {
-            const { begin = 0, duration = 1000, position, colour } = this.fireworkConfig;
+            this.validateNumericValues();
+
+            const { position, colour } = this.fireworkConfig;
             const { x, y } = position;
 
-            this.validateNumericValues(begin, duration, x, y);
-
             const emitterConfig = this.createEmitterConfig(x, y, colour);
-            const emitter = new PIXI.particles.Emitter(this.container, emitterConfig);
-
-            this.startParticleEffect(emitter, begin, duration);
+            this.emitter = new PIXI.particles.Emitter(this.container, emitterConfig);
+            this.startParticleEffect();
         } catch (error) {
             console.error("Error creating firework:", error.message);
         }
     }
 
-    startParticleEffect(emitter, begin, duration) {
-        const startTime = Date.now() + begin;
-
+    startParticleEffect() {
         const update = () => {
             requestAnimationFrame(update);
 
             const currentTime = Date.now();
-            
-            if (currentTime >= startTime) {
 
-                const elapsedTime = currentTime - startTime;
-                emitter.update((1 - (elapsedTime * 0.0001)) > 0.5 ? (1 - (elapsedTime * 0.0001)) : 0.5);
-
-                if (elapsedTime >= duration) {
-                    emitter.emit = false;
-                }
+            if (currentTime >= this.startTime) {
+                this.emitter.update((currentTime - this.startTime) * 0.001);
+                this.startTime = currentTime;
             }
         };
 
@@ -71,22 +67,32 @@ export default class Fountain {
 
     createEmitterConfig(x, y, colour) {
         return {
-            lifetime: { min: 3, max: 18 },
-            frequency: 0.005,
-            spawnChance: 5,
-            particlesPerWave: 10,
+            lifetime: { min: 0.5, max: 1.5 },
+            frequency: 0.001,
+            spawnChance: 1,
+            particlesPerWave: 3,
             maxParticles: 150,
+            emitterLifetime: this.fireworkConfig.duration * 0.001,
             pos: { x, y },
             addAtBack: false,
             behaviors: [
-                { type: 'alpha', config: { alpha: { list: [{ value: 1, time: 0 }, { value: 0.8, time: 0.5 }, { value: 0.3, time: 1 }] } } },
-                { type: 'scale', config: { scale: { list: [{ value: 0.3, time: 0 }, { value: 1, time: 1 }] } } },
+                { type: 'alpha', config: { alpha: { list: [{ value: 1, time: 0 }, { value: 0.5, time: 0.8 }, { value: 0.1, time: 1 }] } } },
+                { type: 'scale', config: { scale: { list: [{ value: 0.1, time: 0 }, { value: 1, time: 1 }] } } },
                 { type: 'color', config: { color: { list: [{ value: '#ffffff', time: 0.3 }, { value: colour, time: 1 }] } } },
-                { type: 'moveSpeed', config: { speed: { list: [{ value: 10, time: 0 }, { value: 15, time: 1 }], isStepped: false }, minMult: 0.2 } },
+                { type: 'moveSpeed', config: { speed: { list: [{ value: 20, time: 0 }, { value: 300, time: 1 }], isStepped: false }, minMult: 0.2 } },
                 { type: 'rotationStatic', config: { min: -110, max: -70 } },
                 { type: 'spawnShape', config: { type: 'circle', data: { x: 0, y: 0, radius: 0 } } },
                 { type: 'textureSingle', config: { texture: PIXI.Texture.from('./assets/particle.png') } },
-            ]
+            ],
         };
+    }
+
+    restart() {
+        try {
+            this.startTime = Date.now() + this.fireworkConfig.begin;
+            this.emitter.playOnce();
+        } catch (error) {
+            console.error("Error restarting fountain:", error.message);
+        }
     }
 }
