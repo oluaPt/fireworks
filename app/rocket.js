@@ -55,7 +55,7 @@ export default class Rocket {
 
             const emitterConfig = this.createEmitterConfig(finalX, finalY);
             this.emitter = new PIXI.particles.Emitter(this.container, emitterConfig);
-            this.startAnimation(particle, duration, velocityX, velocityY, finalX, finalY);
+            this.startAnimation(particle, duration, velocityX, velocityY);
         } catch (error) {
             console.error("Error creating rocket:", error.message);
         }
@@ -76,7 +76,7 @@ export default class Rocket {
         return particle;
     }
 
-    startAnimation(particle, duration, velocityX, velocityY, positionX, positionY) {
+    startAnimation(particle, duration, velocityX, velocityY) {
         this.ticker.add(() => {
             const currentTime = Date.now();
             const elapsedTime = currentTime - this.startTime;
@@ -94,7 +94,7 @@ export default class Rocket {
 
                 if(!this.animationCompleted) {
                     if(this.firstAnimation) {
-                        this.startParticleEffect(positionX, positionY);
+                        this.startParticleEffect();
                         this.firstAnimation = false;
                     } else {
                         this.emitter.playOnce();
@@ -107,7 +107,7 @@ export default class Rocket {
         this.ticker.start();
     }
 
-    startParticleEffect(x, y) {
+    startParticleEffect() {
         let startTimeEffect = Date.now();
         const update = () => {
             requestAnimationFrame(update);

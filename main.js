@@ -2,13 +2,12 @@ import XmlLoader from "./app/xmlLoader.js";
 import Fountain from "./app/fountain.js";
 import Rocket from "./app/rocket.js";
 
-let app, container, fireworksInstances, totalDuration, restartTime = 2000;
+let app, container, fireworksInstances = [], totalDuration, restartTime = 2000;
 
 async function startApp() {
     app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
     document.body.appendChild(app.view);
     container = createContainer();
-    fireworksInstances = [];
 
     try {
         const fireworksData = await XmlLoader.load("xml/fireworks.xml");
@@ -36,14 +35,13 @@ function createFireworks(fireworksData) {
 
             if (FireworkClass) {
                 const fireworkInstance = new FireworkClass(container, fireworkData);
-                const fireworkEndTime = fireworkData.begin + fireworkData.duration;
+                fireworkInstance.create();
+                fireworksInstances.push({ instance: fireworkInstance });
 
+                const fireworkEndTime = fireworkData.begin + fireworkData.duration;
                 if (fireworkEndTime > longestDuration) {
                     longestDuration = fireworkEndTime;
                 }
-
-                fireworkInstance.create();
-                fireworksInstances.push({ instance: fireworkInstance, config: fireworkData });
             } else {
                 console.warn("Unknown firework type:", fireworkData.type);
             }
