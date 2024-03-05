@@ -39,7 +39,7 @@ export default class Rocket {
 
     create() {
         try {
-            const { duration, position, velocity, begin = 0 } = this.fireworkConfig;
+            const { duration, position, velocity } = this.fireworkConfig;
             const { x: initialX, y: initialY } = position;
             const { x: velocityX, y: velocityY } = velocity;
 
@@ -48,7 +48,12 @@ export default class Rocket {
             const particle = this.createRocketParticle(initialX, initialY);
             this.container.addChild(particle);
 
-            this.createStartAnimation(particle, duration, velocityX, velocityY);
+            const positionX = initialX + (velocityX * (duration * 0.001));
+            const positionY = initialY + (velocityY * (duration * 0.001));
+
+            const emitterConfig = this.createEmitterConfig(positionX, positionY);
+            this.emitter = new PIXI.particles.Emitter(this.container, emitterConfig);
+            this.startAnimation(particle, duration, velocityX, velocityY, positionX, positionY);
         } catch (error) {
             console.error("Error creating rocket:", error.message);
         }
@@ -69,7 +74,7 @@ export default class Rocket {
         return particle;
     }
 
-    createStartAnimation(particle, duration, velocityX, velocityY) {
+    startAnimation(particle, duration, velocityX, velocityY, positionX, positionY) {
         this.ticker.add(() => {
             const currentTime = Date.now();
             const elapsedTime = currentTime - this.startTime;
@@ -87,9 +92,6 @@ export default class Rocket {
 
                 if(!this.animationCompleted) {
                     if(this.firstAnimation) {
-                        let positionX = this.fireworkConfig.position.x + (this.fireworkConfig.velocity.x * (this.fireworkConfig.duration * 0.001));
-                        let positionY = this.fireworkConfig.position.y + this.fireworkConfig.velocity.y * (this.fireworkConfig.duration * 0.001);
-
                         this.startParticleEffect(positionX, positionY);
                         this.firstAnimation = false;
                     } else {
@@ -105,16 +107,10 @@ export default class Rocket {
     }
 
     startParticleEffect(x, y) {
-        const emitterConfig = this.createEmitterConfig(x, y);
-        this.emitter = new PIXI.particles.Emitter(this.container, emitterConfig);
-
         let startTimeEffect = Date.now();
-
         const update = () => {
             requestAnimationFrame(update);
-
             const now = Date.now();
-
             this.emitter.update((now - startTimeEffect) * 0.001);
             startTimeEffect = now;
         };

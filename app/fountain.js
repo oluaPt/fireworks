@@ -6,6 +6,7 @@ export default class Fountain {
         this.fireworkConfig = fireworkConfig;
         this.emitter = null;
         this.startTime = Date.now() + fireworkConfig.begin;
+        this.validateNumericValues();
     }
 
     static validateNumericValue(value, paramName) {
@@ -37,8 +38,6 @@ export default class Fountain {
 
     create() {
         try {
-            this.validateNumericValues();
-
             const { position, colour } = this.fireworkConfig;
             const { x, y } = position;
 
@@ -53,9 +52,7 @@ export default class Fountain {
     startParticleEffect() {
         const update = () => {
             requestAnimationFrame(update);
-
             const currentTime = Date.now();
-
             if (currentTime >= this.startTime) {
                 this.emitter.update((currentTime - this.startTime) * 0.001);
                 this.startTime = currentTime;
