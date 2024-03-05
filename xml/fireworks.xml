@@ -16,7 +16,7 @@
        <Position x="400" y="280"/>
     </Firework>
 
-    <Firework begin="500" type="Rocket" colour="0xFF2020" duration="1500">
+    <Firework begin="700" type="Rocket" colour="0xFF2020" duration="1500">
         <Position x="-400" y="420"/>
         <Velocity x="100" y="-300"/>
     </Firework>

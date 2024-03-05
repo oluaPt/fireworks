@@ -47,13 +47,8 @@ export default class Rocket {
 
             const particle = this.createRocketParticle(initialX, initialY);
             this.container.addChild(particle);
-            const startAnimation = this.createStartAnimation(particle, duration, velocityX, velocityY);
 
-            if (begin > 0) {
-                setTimeout( startAnimation, begin);
-            } else {
-                startAnimation();
-            }
+            this.createStartAnimation(particle, duration, velocityX, velocityY);
         } catch (error) {
             console.error("Error creating rocket:", error.message);
         }
@@ -75,42 +70,38 @@ export default class Rocket {
     }
 
     createStartAnimation(particle, duration, velocityX, velocityY) {
-        return () => {
-            this.startTime = Date.now();
+        this.ticker.add(() => {
+            const currentTime = Date.now();
+            const elapsedTime = currentTime - this.startTime;
 
-            this.ticker.add(() => {
-                const currentTime = Date.now();
-                const elapsedTime = currentTime - this.startTime;
+            if (elapsedTime < duration) {
+                const progress = elapsedTime / duration;
+                const distanceX = velocityX * progress * (elapsedTime / 1000);
+                const distanceY = velocityY * progress * (elapsedTime / 1000);
 
-                if (elapsedTime < duration) {
-                    const progress = elapsedTime / duration;
-                    const distanceX = velocityX * progress * (elapsedTime / 1000);
-                    const distanceY = velocityY * progress * (elapsedTime / 1000);
+                particle.position.set(particle.initialX + distanceX, particle.initialY + distanceY);
+                particle.alpha = progress;
+                particle.blur = progress;
+            } else {
+                particle.alpha = 0;
 
-                    particle.position.set(particle.initialX + distanceX, particle.initialY + distanceY);
-                    particle.alpha = progress;
-                    particle.blur = progress;
-                } else {
-                    particle.alpha = 0;
+                if(!this.animationCompleted) {
+                    if(this.firstAnimation) {
+                        let positionX = this.fireworkConfig.position.x + (this.fireworkConfig.velocity.x * (this.fireworkConfig.duration * 0.001));
+                        let positionY = this.fireworkConfig.position.y + this.fireworkConfig.velocity.y * (this.fireworkConfig.duration * 0.001);
 
-                    if(!this.animationCompleted) {
-                        if(this.firstAnimation) {
-                            let positionX = this.fireworkConfig.position.x + (this.fireworkConfig.velocity.x * (this.fireworkConfig.duration*0.001));
-                            let positionY = this.fireworkConfig.position.y + this.fireworkConfig.velocity.y * (this.fireworkConfig.duration*0.001);
-    
-                            this.startParticleEffect(positionX, positionY);
-                            this.firstAnimation = false;
-                        } else {
-                            this.emitter.playOnce();
-                        }
-                        this.animationCompleted = true;
+                        this.startParticleEffect(positionX, positionY);
+                        this.firstAnimation = false;
+                    } else {
+                        this.emitter.playOnce();
                     }
-                    
+                    this.animationCompleted = true;
                 }
-            });
+                
+            }
+        });
 
-            this.ticker.start();
-        };
+        this.ticker.start();
     }
 
     startParticleEffect(x, y) {
