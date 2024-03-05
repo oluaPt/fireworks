@@ -8,7 +8,6 @@ export default class Rocket {
         this.firstAnimation = true;
         this.animationCompleted = false;
         this.emitter = null;
-        this.startAnimation = null;
         this.startTime = Date.now() + fireworkConfig.begin;
     }
 
@@ -48,12 +47,12 @@ export default class Rocket {
 
             const particle = this.createRocketParticle(initialX, initialY);
             this.container.addChild(particle);
-            this.startAnimation = this.createStartAnimation(particle, duration, velocityX, velocityY);
+            const startAnimation = this.createStartAnimation(particle, duration, velocityX, velocityY);
 
             if (begin > 0) {
-                setTimeout( this.startAnimation, begin);
+                setTimeout( startAnimation, begin);
             } else {
-                this.startAnimation();
+                startAnimation();
             }
         } catch (error) {
             console.error("Error creating rocket:", error.message);
@@ -92,7 +91,6 @@ export default class Rocket {
                     particle.alpha = progress;
                     particle.blur = progress;
                 } else {
-                    this.ticker.stop();
                     particle.alpha = 0;
 
                     if(!this.animationCompleted) {
@@ -159,7 +157,6 @@ export default class Rocket {
         try {
             this.startTime = Date.now() + this.fireworkConfig.begin;
             this.animationCompleted = false;
-            setTimeout( this.startAnimation, this.fireworkConfig.begin);
         } catch (error) {
             console.error("Error restarting rocket:", error.message);
         }
