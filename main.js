@@ -10,9 +10,7 @@ async function startApp() {
     app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
     document.body.appendChild(app.view);
     container = createContainer();
-
-    // uncomment to create counters
-    // createCounters();
+    createCounters();
 
     try {
         const fireworksData = await XmlLoader.load("xml/fireworks.xml");

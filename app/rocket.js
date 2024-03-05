@@ -1,44 +1,23 @@
-export default class Rocket {
+import Firework from './firework.js';
+
+export default class Rocket extends Firework {
     constructor(container, fireworkConfig) {
-        this.container = container;
-        this.fireworkConfig = fireworkConfig;
-        this.validateParameters(container, fireworkConfig);
-        this.checkPixiAvailability();
-        this.validateNumericValues();
-        this.startTime = Date.now() + fireworkConfig.begin;
+        super(container, fireworkConfig);
         this.ticker = new PIXI.Ticker();
-        this.emitter = null;
+        this.checkTickerAvailability();
         this.firstAnimation = true;
         this.animationCompleted = false;
-    }
-
-    static validateNumericValue(value, paramName) {
-        if (isNaN(value)) {
-            throw new Error(`Invalid value for ${paramName}. Please provide a valid numeric value.`);
-        }
-    }
-
-    validateParameters(container, fireworkConfig) {
-        if (!container || !fireworkConfig) {
-            throw new Error("Both 'container' and 'fireworkConfig' are required parameters.");
-        }
-    }
-
-    checkPixiAvailability() {
-        if (!PIXI || !PIXI.particles || !PIXI.particles.Emitter) {
-            throw new Error("PIXI and PIXI.particles.Emitter must be available.");
-        }
     }
 
     validateNumericValues() {
         const { begin, duration, position: { x, y }, velocity: { x:velX, y:velY } } = this.fireworkConfig;
 
-        Rocket.validateNumericValue(begin, 'begin');
-        Rocket.validateNumericValue(duration, 'duration');
-        Rocket.validateNumericValue(x, 'position.x');
-        Rocket.validateNumericValue(y, 'position.y');
-        Rocket.validateNumericValue(velX, 'velocity.x');
-        Rocket.validateNumericValue(velY, 'velocity.y');
+        this.validateNumericValue(begin, 'begin');
+        this.validateNumericValue(duration, 'duration');
+        this.validateNumericValue(x, 'position.x');
+        this.validateNumericValue(y, 'position.y');
+        this.validateNumericValue(velX, 'velocity.x');
+        this.validateNumericValue(velY, 'velocity.y');
     }
 
     create() {
@@ -144,7 +123,7 @@ export default class Rocket {
 
     restart() {
         try {
-            this.startTime = Date.now() + this.fireworkConfig.begin;
+            super.restart();
             this.animationCompleted = false;
             this.ticker.start();
         } catch (error) {

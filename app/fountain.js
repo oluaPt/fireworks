@@ -1,39 +1,17 @@
-export default class Fountain {
+import Firework from './firework.js';
+
+export default class Fountain extends Firework {
     constructor(container, fireworkConfig) {
-        this.container = container;
-        this.fireworkConfig = fireworkConfig;
-        this.validateParameters(container, fireworkConfig);
-        this.checkPixiAvailability();
-        this.validateNumericValues();
-        this.startTime = Date.now() + fireworkConfig.begin;
-        this.emitter = null;
-    }
-
-    static validateNumericValue(value, paramName) {
-        if (isNaN(value)) {
-            throw new Error(`Invalid value for ${paramName}. Please provide a valid numeric value.`);
-        }
-    }
-
-    validateParameters(container, fireworkConfig) {
-        if (!container || !fireworkConfig) {
-            throw new Error("Both 'container' and 'fireworkConfig' are required parameters.");
-        }
-    }
-
-    checkPixiAvailability() {
-        if (!PIXI || !PIXI.particles || !PIXI.particles.Emitter) {
-            throw new Error("PIXI and PIXI.particles.Emitter must be available.");
-        }
+        super(container, fireworkConfig);
     }
 
     validateNumericValues() {
         const { begin, duration, position: { x, y } } = this.fireworkConfig;
 
-        Fountain.validateNumericValue(begin, 'begin');
-        Fountain.validateNumericValue(duration, 'duration');
-        Fountain.validateNumericValue(x, 'position.x');
-        Fountain.validateNumericValue(y, 'velocity.y');
+        this.validateNumericValue(begin, 'begin');
+        this.validateNumericValue(duration, 'duration');
+        this.validateNumericValue(x, 'position.x');
+        this.validateNumericValue(y, 'position.y');
     }
 
     create() {
@@ -85,7 +63,7 @@ export default class Fountain {
 
     restart() {
         try {
-            this.startTime = Date.now() + this.fireworkConfig.begin;
+            super.restart();
             this.emitter.playOnce();
         } catch (error) {
             console.error("Error restarting fountain:", error.message);
