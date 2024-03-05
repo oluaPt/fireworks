@@ -4,9 +4,9 @@ export default class Fountain {
         this.checkPixiAvailability();
         this.container = container;
         this.fireworkConfig = fireworkConfig;
+        this.validateNumericValues();
         this.emitter = null;
         this.startTime = Date.now() + fireworkConfig.begin;
-        this.validateNumericValues();
     }
 
     static validateNumericValue(value, paramName) {
@@ -38,8 +38,7 @@ export default class Fountain {
 
     create() {
         try {
-            const { position, colour } = this.fireworkConfig;
-            const { x, y } = position;
+            const { colour, position: { x, y } } = this.fireworkConfig;
 
             const emitterConfig = this.createEmitterConfig(x, y, colour);
             this.emitter = new PIXI.particles.Emitter(this.container, emitterConfig);

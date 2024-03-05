@@ -8,6 +8,7 @@ export default class Rocket {
         this.firstAnimation = true;
         this.animationCompleted = false;
         this.emitter = null;
+        this.validateNumericValues();
         this.startTime = Date.now() + fireworkConfig.begin;
     }
 
@@ -29,12 +30,15 @@ export default class Rocket {
         }
     }
 
-    validateNumericValues(duration, initialX, initialY, velocityX, velocityY) {
+    validateNumericValues() {
+        const { begin, duration, position: { x, y }, velocity: { x:velX, y:velY } } = this.fireworkConfig;
+
+        Rocket.validateNumericValue(begin, 'begin');
         Rocket.validateNumericValue(duration, 'duration');
-        Rocket.validateNumericValue(initialX, 'position.x');
-        Rocket.validateNumericValue(initialY, 'position.y');
-        Rocket.validateNumericValue(velocityX, 'velocity.x');
-        Rocket.validateNumericValue(velocityY, 'velocity.y');
+        Rocket.validateNumericValue(x, 'position.x');
+        Rocket.validateNumericValue(y, 'position.y');
+        Rocket.validateNumericValue(velX, 'velocity.x');
+        Rocket.validateNumericValue(velY, 'velocity.y');
     }
 
     create() {
@@ -43,17 +47,15 @@ export default class Rocket {
             const { x: initialX, y: initialY } = position;
             const { x: velocityX, y: velocityY } = velocity;
 
-            this.validateNumericValues(duration, initialX, initialY, velocityX, velocityY);
-
             const particle = this.createRocketParticle(initialX, initialY);
             this.container.addChild(particle);
 
-            const positionX = initialX + (velocityX * (duration * 0.001));
-            const positionY = initialY + (velocityY * (duration * 0.001));
+            const finalX = initialX + (velocityX * (duration * 0.001));
+            const finalY = initialY + (velocityY * (duration * 0.001));
 
-            const emitterConfig = this.createEmitterConfig(positionX, positionY);
+            const emitterConfig = this.createEmitterConfig(finalX, finalY);
             this.emitter = new PIXI.particles.Emitter(this.container, emitterConfig);
-            this.startAnimation(particle, duration, velocityX, velocityY, positionX, positionY);
+            this.startAnimation(particle, duration, velocityX, velocityY, finalX, finalY);
         } catch (error) {
             console.error("Error creating rocket:", error.message);
         }
@@ -99,7 +101,6 @@ export default class Rocket {
                     }
                     this.animationCompleted = true;
                 }
-                
             }
         });
 
