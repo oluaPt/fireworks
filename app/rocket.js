@@ -1,15 +1,15 @@
 export default class Rocket {
     constructor(container, fireworkConfig) {
-        this.validateParameters(container, fireworkConfig);
-        this.checkPixiAvailability();
         this.container = container;
         this.fireworkConfig = fireworkConfig;
-        this.ticker = new PIXI.Ticker();
-        this.firstAnimation = true;
-        this.animationCompleted = false;
-        this.emitter = null;
+        this.validateParameters(container, fireworkConfig);
+        this.checkPixiAvailability();
         this.validateNumericValues();
         this.startTime = Date.now() + fireworkConfig.begin;
+        this.ticker = new PIXI.Ticker();
+        this.emitter = null;
+        this.firstAnimation = true;
+        this.animationCompleted = false;
     }
 
     static validateNumericValue(value, paramName) {
@@ -46,15 +46,15 @@ export default class Rocket {
             const { duration, position, velocity } = this.fireworkConfig;
             const { x: initialX, y: initialY } = position;
             const { x: velocityX, y: velocityY } = velocity;
+            const finalX = initialX + (velocityX * (duration * 0.001));
+            const finalY = initialY + (velocityY * (duration * 0.001));
 
             const particle = this.createRocketParticle(initialX, initialY);
             this.container.addChild(particle);
 
-            const finalX = initialX + (velocityX * (duration * 0.001));
-            const finalY = initialY + (velocityY * (duration * 0.001));
-
             const emitterConfig = this.createEmitterConfig(finalX, finalY);
             this.emitter = new PIXI.particles.Emitter(this.container, emitterConfig);
+
             this.startAnimation(particle, duration, velocityX, velocityY);
         } catch (error) {
             console.error("Error creating rocket:", error.message);
@@ -100,6 +100,7 @@ export default class Rocket {
                         this.emitter.playOnce();
                     }
                     this.animationCompleted = true;
+                    this.ticker.stop();
                 }
             }
         });
@@ -145,6 +146,7 @@ export default class Rocket {
         try {
             this.startTime = Date.now() + this.fireworkConfig.begin;
             this.animationCompleted = false;
+            this.ticker.start();
         } catch (error) {
             console.error("Error restarting rocket:", error.message);
         }

@@ -12,13 +12,7 @@ async function startApp() {
     container = createContainer();
 
     // uncomment to create counters
-    /*
-    frameCounter = createCounter("FPS", "10px", "0px");
-    memoryCounter = createCounter("Memory (MB)", "30px", "0px");
-    app.ticker.add(() => {
-        updateCounters();
-    });
-    */
+    // createCounters();
 
     try {
         const fireworksData = await XmlLoader.load("xml/fireworks.xml");
@@ -27,14 +21,6 @@ async function startApp() {
     } catch (error) {
         console.error("Error loading fireworks data:", error.message);
     }
-}
-
-function createContainer() {
-    const container = new PIXI.Container();
-    container.position.set(app.screen.width / 2, app.screen.height / 2);
-    container.pivot.set(container.width / 2, container.height / 2);
-    app.stage.addChild(container);
-    return container;
 }
 
 function createFireworks(fireworksData) {
@@ -72,6 +58,23 @@ function restartFireworks() {
     setTimeout(restartFireworks, totalDuration + restartTime);
 }
 
+function createContainer() {
+    const container = new PIXI.Container();
+    container.position.set(app.screen.width / 2, app.screen.height / 2);
+    container.pivot.set(container.width / 2, container.height / 2);
+    app.stage.addChild(container);
+    return container;
+}
+
+function createCounters() {
+    frameCounter = createCounter("FPS", "10px", "0px");
+    memoryCounter = createCounter("Memory (MB)", "30px", "0px");
+    app.ticker.add(() => {
+        updateFrameCounter();
+        updateMemoryCounter();
+    });
+}
+
 function createCounter(label, top, left) {
     const counter = document.createElement("div");
     counter.style.position = "absolute";
@@ -81,11 +84,6 @@ function createCounter(label, top, left) {
     counter.textContent = `${label}: 0`;
     document.body.appendChild(counter);
     return counter;
-}
-
-function updateCounters() {
-    updateFrameCounter();
-    updateMemoryCounter();
 }
 
 function updateFrameCounter() {
@@ -99,7 +97,6 @@ function updateFrameCounter() {
         frameCounter.textContent = `FPS: ${fps.toFixed(2)}`;
     }
 }
-
 
 function updateMemoryCounter() {
     const memoryUsageMB = (window.performance.memory.usedJSHeapSize / (1024 * 1024)).toFixed(2);

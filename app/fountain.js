@@ -1,12 +1,12 @@
 export default class Fountain {
     constructor(container, fireworkConfig) {
-        this.validateParameters(container, fireworkConfig);
-        this.checkPixiAvailability();
         this.container = container;
         this.fireworkConfig = fireworkConfig;
+        this.validateParameters(container, fireworkConfig);
+        this.checkPixiAvailability();
         this.validateNumericValues();
-        this.emitter = null;
         this.startTime = Date.now() + fireworkConfig.begin;
+        this.emitter = null;
     }
 
     static validateNumericValue(value, paramName) {
