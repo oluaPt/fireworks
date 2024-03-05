@@ -4,11 +4,15 @@ import Rocket from "./app/rocket.js";
 
 let app, container, fireworksInstances = [], totalDuration, restartTime = 2000;
 
+// Added frame rate counter variables
+let frameCounter, frameCount = 0, lastFrameTime = Date.now();
+
 async function startApp() {
     app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
     document.body.appendChild(app.view);
     container = createContainer();
-
+    // uncomment to show frames counter
+    // createCounter();
     try {
         const fireworksData = await XmlLoader.load("xml/fireworks.xml");
         totalDuration = createFireworks(fireworksData);
@@ -24,6 +28,31 @@ function createContainer() {
     container.pivot.set(container.width / 2, container.height / 2);
     app.stage.addChild(container);
     return container;
+}
+
+function createCounter() {
+    frameCounter = document.createElement("div");
+    frameCounter.style.position = "absolute";
+    frameCounter.style.top = "10px";
+    frameCounter.style.left = "10px";
+    frameCounter.style.color = "white";
+    document.body.appendChild(frameCounter);
+
+    app.ticker.add(() => {
+        updateFrameCounter();
+    });
+
+    function updateFrameCounter() {
+        const now = Date.now();
+        const deltaTime = now - lastFrameTime;
+        lastFrameTime = now;
+        const fps = 1000 / deltaTime;
+    
+        frameCount++;
+        if (frameCount % 10 === 0) {
+            frameCounter.textContent = `FPS: ${fps.toFixed(2)}`;
+        }
+    }
 }
 
 function createFireworks(fireworksData) {
