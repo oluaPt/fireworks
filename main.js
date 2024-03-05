@@ -3,8 +3,6 @@ import Fountain from "./app/fountain.js";
 import Rocket from "./app/rocket.js";
 
 let app, container, fireworksInstances = [], totalDuration, restartTime = 2000;
-
-// Added frame rate counter variables
 let frameCounter, frameCount = 0, lastFrameTime = Date.now();
 
 async function startApp() {
@@ -38,10 +36,6 @@ function createCounter() {
     frameCounter.style.color = "white";
     document.body.appendChild(frameCounter);
 
-    app.ticker.add(() => {
-        updateFrameCounter();
-    });
-
     function updateFrameCounter() {
         const now = Date.now();
         const deltaTime = now - lastFrameTime;
@@ -53,6 +47,10 @@ function createCounter() {
             frameCounter.textContent = `FPS: ${fps.toFixed(2)}`;
         }
     }
+
+    app.ticker.add(() => {
+        updateFrameCounter();
+    });
 }
 
 function createFireworks(fireworksData) {
