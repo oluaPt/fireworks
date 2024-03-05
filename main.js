@@ -1,6 +1,5 @@
 import XmlLoader from "./app/xmlLoader.js";
-import Fountain from "./app/fountain.js";
-import Rocket from "./app/rocket.js";
+import FireworkFactory from './app/fireworkFactory.js';
 
 let app, container, fireworksInstances = [], totalDuration, restartTime = 2000;
 let frameCounter, memoryCounter;
@@ -10,7 +9,7 @@ async function startApp() {
     app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
     document.body.appendChild(app.view);
     container = createContainer();
-    createCounters();
+    // createCounters();
 
     try {
         const fireworksData = await XmlLoader.load("xml/fireworks.xml");
@@ -26,19 +25,13 @@ function createFireworks(fireworksData) {
 
     fireworksData.forEach(fireworkData => {
         try {
-            const FireworkClass = fireworkData.type === "Fountain" ? Fountain : fireworkData.type === "Rocket" ? Rocket : null;
+            const fireworkInstance = FireworkFactory.createFirework(container, fireworkData);
+            fireworkInstance.create();
+            fireworksInstances.push({ instance: fireworkInstance });
 
-            if (FireworkClass) {
-                const fireworkInstance = new FireworkClass(container, fireworkData);
-                fireworkInstance.create();
-                fireworksInstances.push({ instance: fireworkInstance });
-
-                const fireworkEndTime = fireworkData.begin + fireworkData.duration;
-                if (fireworkEndTime > longestDuration) {
-                    longestDuration = fireworkEndTime;
-                }
-            } else {
-                console.warn("Unknown firework type:", fireworkData.type);
+            const fireworkEndTime = fireworkData.begin + fireworkData.duration;
+            if (fireworkEndTime > longestDuration) {
+                longestDuration = fireworkEndTime;
             }
         } catch (error) {
             console.error("Error creating firework:", error.message);
