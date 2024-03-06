@@ -6,7 +6,6 @@ export default class Rocket extends Firework {
         this.ticker = new PIXI.Ticker();
         this.checkTickerAvailability();
         this.firstAnimation = true;
-        this.animationCompleted = false;
     }
 
     validateNumericValues() {
@@ -69,18 +68,14 @@ export default class Rocket extends Firework {
                 particle.alpha = progress;
                 particle.blur = progress;
             } else {
-                particle.alpha = 0;
-
-                if(!this.animationCompleted) {
-                    if(this.firstAnimation) {
-                        this.startParticleEffect();
-                        this.firstAnimation = false;
-                    } else {
-                        this.emitter.playOnce();
-                    }
-                    this.animationCompleted = true;
-                    this.ticker.stop();
+                if(this.firstAnimation) {
+                    this.startParticleEffect();
+                    this.firstAnimation = false;
+                } else {
+                    this.emitter.playOnce();
                 }
+                particle.alpha = 0;
+                this.ticker.stop();
             }
         });
 
@@ -101,6 +96,7 @@ export default class Rocket extends Firework {
 
     createEmitterConfig(x, y) {
         const colour = this.fireworkConfig.colour;
+
         return {
             lifetime: { min: 0.1, max: 0.5 },
             frequency: 0.0005,
@@ -120,15 +116,5 @@ export default class Rocket extends Firework {
                 { type: 'textureSingle', config: { texture: PIXI.Texture.from('./assets/particle.png') } }
             ],
         };
-    }
-
-    restart() {
-        try {
-            super.restart();
-            this.animationCompleted = false;
-            this.ticker.start();
-        } catch (error) {
-            console.error("Error restarting rocket:", error.message);
-        }
     }
 }

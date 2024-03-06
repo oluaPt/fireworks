@@ -48,6 +48,13 @@ export default class Firework {
     restart() {
         try {
             this.startTime = Date.now() + this.fireworkConfig.begin;
+            if(this.fireworkConfig.type === 'Fountain') {
+                this.emitter.playOnce();
+            } else if(this.fireworkConfig.type === 'Rocket' && this.ticker) {
+                this.ticker.start();
+            } else {
+                throw new Error("No type Fountain or Rocket found in restart function.");
+            }
         } catch (error) {
             console.error("Error restarting firework:", error.message);
         }

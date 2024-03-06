@@ -11,7 +11,7 @@ export default class MainApp {
         document.body.appendChild(this.app.view);
 
         this.container = this.createContainer();
-        // this.createCounters();
+        this.createCounters();
 
         document.addEventListener("DOMContentLoaded", () => this.startApp());
     }
@@ -55,6 +55,14 @@ export default class MainApp {
         setTimeout(() => this.restartFireworks(), this.totalDuration + this.restartTime);
     }
 
+    createContainer() {
+        const container = new PIXI.Container();
+        container.position.set(this.app.screen.width / 2, this.app.screen.height / 2);
+        container.pivot.set(container.width / 2, container.height / 2);
+        this.app.stage.addChild(container);
+        return container;
+    }
+
     createCounters() {
         this.frameCounter = this.createCounter("FPS", "10px", "0px");
         this.memoryCounter = this.createCounter("Memory (MB)", "30px", "0px");
@@ -66,14 +74,6 @@ export default class MainApp {
             this.updateFrameCounter();
             this.updateMemoryCounter();
         });
-    }
-
-    createContainer() {
-        const container = new PIXI.Container();
-        container.position.set(this.app.screen.width / 2, this.app.screen.height / 2);
-        container.pivot.set(container.width / 2, container.height / 2);
-        this.app.stage.addChild(container);
-        return container;
     }
 
     createCounter(label, top, left) {

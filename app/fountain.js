@@ -42,6 +42,7 @@ export default class Fountain extends Firework {
         const y = this.fireworkConfig.position.y;
         const colour = this.fireworkConfig.colour;
         const duration = this.fireworkConfig.duration;
+
         return {
             lifetime: { min: 0.5, max: 1.5 },
             frequency: 0.001,
@@ -61,14 +62,5 @@ export default class Fountain extends Firework {
                 { type: 'textureSingle', config: { texture: PIXI.Texture.from('./assets/particle.png') } },
             ],
         };
-    }
-
-    restart() {
-        try {
-            super.restart();
-            this.emitter.playOnce();
-        } catch (error) {
-            console.error("Error restarting fountain:", error.message);
-        }
     }
 }
