@@ -12,4 +12,15 @@ export default class FireworkFactory {
                 throw new Error(`Unknown firework type: ${fireworkConfig.type}`);
         }
     }
+
+    static callRestart(type) {
+        switch (type) {
+            case 'Fountain':
+                return "restartEmitter";
+            case 'Rocket':
+                return "restartTicker";
+            default:
+                throw new Error(`Unknown type: ${type}`);
+        }
+    }
 }

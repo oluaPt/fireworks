@@ -21,13 +21,13 @@ export default class Rocket extends Firework {
 
     create() {
         try {
-            const { duration, position, velocity } = this.fireworkConfig;
+            const { duration, position, velocity, colour } = this.fireworkConfig;
             const { x: initialX, y: initialY } = position;
             const { x: velocityX, y: velocityY } = velocity;
             const finalX = initialX + (velocityX * (duration * 0.001));
             const finalY = initialY + (velocityY * (duration * 0.001));
 
-            const particle = this.createRocketParticle(initialX, initialY);
+            const particle = this.createRocketParticle(initialX, initialY, colour);
             this.container.addChild(particle);
 
             const emitterConfig = this.createEmitterConfig(finalX, finalY);
@@ -39,7 +39,7 @@ export default class Rocket extends Firework {
         }
     }
 
-    createRocketParticle(x, y) {
+    createRocketParticle(x, y, colour) {
         const particle = PIXI.Sprite.from('./assets/rocket.png');
         particle.anchor.set(0.5);
         particle.position.set(x, y);
@@ -47,7 +47,7 @@ export default class Rocket extends Firework {
         particle.initialY = y;
         particle.height = 50;
         particle.width = 50;
-        particle.tint = this.fireworkConfig.colour;
+        particle.tint = colour;
         particle.alpha = 0;
         particle.blur = 0;
 
@@ -84,6 +84,7 @@ export default class Rocket extends Firework {
 
     startParticleEffect() {
         let startTimeEffect = Date.now();
+        
         const update = () => {
             requestAnimationFrame(update);
             const now = Date.now();

@@ -1,3 +1,6 @@
+
+import FireworkFactory from './fireworkFactory.js';
+
 export default class Firework {
     constructor(container, fireworkConfig) {
         this.container = container;
@@ -48,15 +51,18 @@ export default class Firework {
     restart() {
         try {
             this.startTime = Date.now() + this.fireworkConfig.begin;
-            if(this.fireworkConfig.type === 'Fountain') {
-                this.emitter.playOnce();
-            } else if(this.fireworkConfig.type === 'Rocket' && this.ticker) {
-                this.ticker.start();
-            } else {
-                throw new Error("No type Fountain or Rocket found in restart function.");
-            }
+            const functionName = FireworkFactory.callRestart(this.fireworkConfig.type);
+            this[functionName](); 
         } catch (error) {
             console.error("Error restarting firework:", error.message);
         }
+    }
+
+    restartEmitter() {
+        this.emitter.playOnce();
+    }
+
+    restartTicker() {
+        this.ticker.start();
     }
 }
