@@ -13,12 +13,12 @@ export default class FireworkFactory {
         }
     }
 
-    static callRestart(type) {
+    static restart(type) {
         switch (type) {
             case 'Fountain':
-                return "restartEmitter";
+                return "restartFountainEmitter";
             case 'Rocket':
-                return "restartTicker";
+                return "restartRocketTicker";
             default:
                 throw new Error(`Unknown type: ${type}`);
         }

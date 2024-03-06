@@ -11,7 +11,7 @@ export default class MainApp {
         document.body.appendChild(this.app.view);
 
         this.container = this.createContainer();
-        this.createCounters();
+        // this.createCounters();
 
         document.addEventListener("DOMContentLoaded", () => this.startApp());
     }

@@ -51,18 +51,19 @@ export default class Firework {
     restart() {
         try {
             this.startTime = Date.now() + this.fireworkConfig.begin;
-            const functionName = FireworkFactory.callRestart(this.fireworkConfig.type);
+            
+            const functionName = FireworkFactory.restart(this.fireworkConfig.type);
             this[functionName](); 
         } catch (error) {
             console.error("Error restarting firework:", error.message);
         }
     }
 
-    restartEmitter() {
+    restartFountainEmitter() {
         this.emitter.playOnce();
     }
 
-    restartTicker() {
+    restartRocketTicker() {
         this.ticker.start();
     }
 }
