@@ -63,4 +63,8 @@ export default class Fountain extends Firework {
             ],
         };
     }
+
+    restartActions() {
+        this.emitter.playOnce();
+    }
 }

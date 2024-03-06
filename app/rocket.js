@@ -118,4 +118,8 @@ export default class Rocket extends Firework {
             ],
         };
     }
+
+    restartActions() {
+        this.ticker.start();
+    }
 }
