@@ -1,5 +1,6 @@
 import Fountain from "./fountain.js";
 import Rocket from "./rocket.js";
+
 export default class FireworkFactory {
     static createFirework(container, fireworkConfig) {
         switch (fireworkConfig.type) {

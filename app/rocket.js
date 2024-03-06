@@ -100,6 +100,7 @@ export default class Rocket extends Firework {
     }
 
     createEmitterConfig(x, y) {
+        const colour = this.fireworkConfig.colour;
         return {
             lifetime: { min: 0.1, max: 0.5 },
             frequency: 0.0005,
@@ -112,7 +113,7 @@ export default class Rocket extends Firework {
             behaviors: [
                 { type: 'alpha', config: { alpha: { list: [{ value: 0.8, time: 0 }, { value: 0.3, time: 1 }] } } },
                 { type: 'scale', config: { scale: { list: [{ value: 0.2, time: 0 }, { value: 0.6, time: 1 }] } } },
-                { type: 'color', config: { color: { list: [{ value: '#ffffff', time: 0 }, { value: this.fireworkConfig.colour, time: 1 }] } } },
+                { type: 'color', config: { color: { list: [{ value: '#ffffff', time: 0 }, { value: colour, time: 1 }] } } },
                 { type: 'moveSpeed', config: { speed: { list: [{ value: 500, time: 0 }, { value: 300, time: 1 }], isStepped: false } } },
                 { type: 'rotationStatic', config: { min: 0, max: 360 } },
                 { type: 'spawnShape', config: { type: 'torus', data: { x: 0, y: 0, radius: 30 } } },

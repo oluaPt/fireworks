@@ -3,24 +3,15 @@ import FireworkFactory from './app/fireworkFactory.js';
 
 export default class MainApp {
     constructor() {
-        this.app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
-        document.body.appendChild(this.app.view);
-
-        this.container = this.createContainer();
         this.fireworksInstances = [];
         this.totalDuration = 0;
         this.restartTime = 2000;
 
-        this.frameCounter = this.createCounter("FPS", "10px", "0px");
-        this.memoryCounter = this.createCounter("Memory (MB)", "30px", "0px");
+        this.app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
+        document.body.appendChild(this.app.view);
 
-        this.frameCount = 0;
-        this.lastFrameTime = Date.now();
-
-        this.app.ticker.add(() => {
-            this.updateFrameCounter();
-            this.updateMemoryCounter();
-        });
+        this.container = this.createContainer();
+        // this.createCounters();
 
         document.addEventListener("DOMContentLoaded", () => this.startApp());
     }
@@ -62,6 +53,19 @@ export default class MainApp {
         });
 
         setTimeout(() => this.restartFireworks(), this.totalDuration + this.restartTime);
+    }
+
+    createCounters() {
+        this.frameCounter = this.createCounter("FPS", "10px", "0px");
+        this.memoryCounter = this.createCounter("Memory (MB)", "30px", "0px");
+
+        this.frameCount = 0;
+        this.lastFrameTime = Date.now();
+
+        this.app.ticker.add(() => {
+            this.updateFrameCounter();
+            this.updateMemoryCounter();
+        });
     }
 
     createContainer() {

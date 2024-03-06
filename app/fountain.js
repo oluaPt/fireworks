@@ -16,9 +16,7 @@ export default class Fountain extends Firework {
 
     create() {
         try {
-            const { colour, position: { x, y } } = this.fireworkConfig;
-
-            const emitterConfig = this.createEmitterConfig(x, y, colour);
+            const emitterConfig = this.createEmitterConfig();
             this.emitter = new PIXI.particles.Emitter(this.container, emitterConfig);
             this.startParticleEffect();
         } catch (error) {
@@ -39,14 +37,18 @@ export default class Fountain extends Firework {
         update();
     }
 
-    createEmitterConfig(x, y, colour) {
+    createEmitterConfig() {
+        const x = this.fireworkConfig.position.x;
+        const y = this.fireworkConfig.position.y;
+        const colour = this.fireworkConfig.colour;
+        const duration = this.fireworkConfig.duration;
         return {
             lifetime: { min: 0.5, max: 1.5 },
             frequency: 0.001,
             spawnChance: 1,
             particlesPerWave: 3,
             maxParticles: 150,
-            emitterLifetime: this.fireworkConfig.duration * 0.001,
+            emitterLifetime: duration * 0.001,
             pos: { x, y },
             addAtBack: false,
             behaviors: [
