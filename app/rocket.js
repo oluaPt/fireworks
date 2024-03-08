@@ -1,25 +1,10 @@
 import Firework from './firework.js';
 
 export default class Rocket extends Firework {
-    constructor(container, fireworkConfig) {
-        super(container, fireworkConfig);
-        this.ticker = new PIXI.Ticker();
-        this.checkTickerAvailability();
-        this.firstAnimation = true;
-    }
+    constructor(container, fireworkConfig, totalDuration = false) {
+        super(container, fireworkConfig, totalDuration);
+        this.startTimeParticle = Date.now() + fireworkConfig.begin;
 
-    validateNumericValues() {
-        const { begin, duration, position: { x, y }, velocity: { x:velX, y:velY } } = this.fireworkConfig;
-
-        this.validateNumericValue(begin, 'begin');
-        this.validateNumericValue(duration, 'duration');
-        this.validateNumericValue(x, 'position.x');
-        this.validateNumericValue(y, 'position.y');
-        this.validateNumericValue(velX, 'velocity.x');
-        this.validateNumericValue(velY, 'velocity.y');
-    }
-
-    create() {
         try {
             const { duration, position, velocity, colour } = this.fireworkConfig;
             const { x: initialX, y: initialY } = position;
@@ -27,73 +12,15 @@ export default class Rocket extends Firework {
             const finalX = initialX + (velocityX * (duration * 0.001));
             const finalY = initialY + (velocityY * (duration * 0.001));
 
-            const particle = this.createRocketParticle(initialX, initialY, colour);
-            this.container.addChild(particle);
+            this.particle = this.createRocketParticle(initialX, initialY, colour);
+            this.container.addChild(this.particle);
 
             const emitterConfig = this.createEmitterConfig(finalX, finalY);
             this.emitter = new PIXI.particles.Emitter(this.container, emitterConfig);
-
-            this.startAnimation(particle, duration, velocityX, velocityY);
         } catch (error) {
             console.error("Error creating rocket:", error.message);
         }
-    }
-
-    createRocketParticle(x, y, colour) {
-        const particle = PIXI.Sprite.from('./assets/rocket.png');
-        particle.anchor.set(0.5);
-        particle.position.set(x, y);
-        particle.initialX = x;
-        particle.initialY = y;
-        particle.height = 50;
-        particle.width = 50;
-        particle.tint = colour;
-        particle.alpha = 0;
-        particle.blur = 0;
-
-        return particle;
-    }
-
-    startAnimation(particle, duration, velocityX, velocityY) {
-        this.ticker.add(() => {
-            const currentTime = Date.now();
-            const elapsedTime = currentTime - this.startTime;
-
-            if (elapsedTime < duration) {
-                const progress = elapsedTime / duration;
-                const distanceX = velocityX * progress * (elapsedTime / 1000);
-                const distanceY = velocityY * progress * (elapsedTime / 1000);
-
-                particle.position.set(particle.initialX + distanceX, particle.initialY + distanceY);
-                particle.alpha = progress;
-                particle.blur = progress;
-            } else {
-                if(this.firstAnimation) {
-                    this.startParticleEffect();
-                    this.firstAnimation = false;
-                } else {
-                    this.emitter.playOnce();
-                }
-                particle.alpha = 0;
-                this.ticker.stop();
-            }
-        });
-
-        this.ticker.start();
-    }
-
-    startParticleEffect() {
-        let startTimeEffect = Date.now();
-        
-        const update = () => {
-            requestAnimationFrame(update);
-            const now = Date.now();
-            this.emitter.update((now - startTimeEffect) * 0.001);
-            startTimeEffect = now;
-        };
-
-        update();
-    }
+    }   
 
     createEmitterConfig(x, y) {
         const colour = this.fireworkConfig.colour;
@@ -119,7 +46,42 @@ export default class Rocket extends Firework {
         };
     }
 
+    createRocketParticle(x, y, colour) {
+        const particle = PIXI.Sprite.from('./assets/rocket.png');
+        particle.anchor.set(0.5);
+        particle.position.set(x, y);
+        particle.initialX = x;
+        particle.initialY = y;
+        particle.height = 50;
+        particle.width = 50;
+        particle.tint = colour;
+        particle.alpha = 0;
+        particle.blur = 0;
+
+        return particle;
+    }
+
+    update(currentTime) {
+        const { duration, velocity } = this.fireworkConfig;
+        const elapsedTime = currentTime - this.startTimeParticle;
+        if (elapsedTime < duration) {
+            const { x: velocityX, y: velocityY } = velocity;
+            const progress = elapsedTime / duration;
+            const distanceX = velocityX * progress * (elapsedTime / 1000);
+            const distanceY = velocityY * progress * (elapsedTime / 1000);
+
+            this.particle.position.set(this.particle.initialX + distanceX, this.particle.initialY + distanceY);
+            this.particle.alpha = progress;
+            this.particle.blur = progress;
+            this.startTime = currentTime;
+        } else {
+            this.particle.alpha = 0;
+            this.emitter.update((currentTime - this.startTime) * 0.001);
+            this.startTime = currentTime;
+        }
+    }
+
     restartActions() {
-        this.ticker.start();
+        this.startTimeParticle = Date.now() + this.fireworkConfig.begin;
     }
 }

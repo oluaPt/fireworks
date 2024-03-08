@@ -3,56 +3,69 @@ import FireworkFactory from './app/fireworkFactory.js';
 
 export default class MainApp {
     constructor() {
-        this.fireworksInstances = [];
-        this.totalDuration = 0;
-        this.restartTime = 2000;
+        try {
+            this.fireworksInstances = [];
+            this.restartTime = 2000;
+            this.app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
+            document.body.appendChild(this.app.view);
+            this.container = this.createContainer();
+            this.createCounters();
 
-        this.app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
-        document.body.appendChild(this.app.view);
-
-        this.container = this.createContainer();
-        this.createCounters();
-
-        document.addEventListener("DOMContentLoaded", () => this.startApp());
+            document.addEventListener("DOMContentLoaded", () => this.startApp());
+        } catch (error) {
+            console.error("Error starting:", error.message);
+        }
     }
 
     async startApp() {
         try {
             const fireworksData = await XmlLoader.load("xml/fireworks.xml");
-            this.totalDuration = this.createFireworks(fireworksData);
-            setTimeout(() => this.restartFireworks(), this.totalDuration + this.restartTime);
+
+            this.createFireworks(fireworksData);
+
+            this.updateFireworks();
+
+            const totalDuration = Math.max(...fireworksData.map(({ begin, duration }) => begin + duration + this.restartTime), 0);
+            setTimeout(() => this.restartFireworks(totalDuration), totalDuration);
         } catch (error) {
-            console.error("Error loading fireworks data:", error.message);
+            console.error("Error starting App:", error.message);
         }
     }
 
     createFireworks(fireworksData) {
-        let longestDuration = 0;
-
-        fireworksData.forEach(fireworkData => {
-            try {
-                const fireworkInstance = FireworkFactory.createFirework(this.container, fireworkData);
-                fireworkInstance.create();
-                this.fireworksInstances.push({ instance: fireworkInstance });
-
-                const fireworkEndTime = fireworkData.begin + fireworkData.duration;
-                if (fireworkEndTime > longestDuration) {
-                    longestDuration = fireworkEndTime;
-                }
-            } catch (error) {
-                console.error("Error creating firework:", error.message);
-            }
-        });
-
-        return longestDuration;
+        try {
+            fireworksData.forEach(fireworkData => {
+                this.fireworksInstances.push(FireworkFactory.createFirework(this.container, fireworkData));
+            });
+        } catch (error) {
+            console.error("Error creating fireworks: ", error.message);
+        }
     }
 
-    restartFireworks() {
-        this.fireworksInstances.forEach(({ instance }) => {
-            instance.restart();
-        });
-
-        setTimeout(() => this.restartFireworks(), this.totalDuration + this.restartTime);
+    updateFireworks() {
+        try { 
+            const update = () => {
+                const currentTime = Date.now();
+                this.fireworksInstances.forEach((instance) => {
+                    instance.update(currentTime);
+                });
+                requestAnimationFrame(update);
+            };
+            update();
+        } catch (error) {
+            console.error("Error updating fireworks: " + error.message);
+        }
+    }
+    
+    restartFireworks(totalDuration) {
+        try { 
+            this.fireworksInstances.forEach((instance) => {
+                instance.restart();
+            });
+            setTimeout(() => this.restartFireworks(totalDuration), totalDuration);
+        } catch (error) {
+            console.error("Error restarting fireworks: " + error.message);
+        }
     }
 
     createContainer() {

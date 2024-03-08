@@ -1,40 +1,14 @@
 import Firework from './firework.js';
 
 export default class Fountain extends Firework {
-    constructor(container, fireworkConfig) {
-        super(container, fireworkConfig);
-    }
-
-    validateNumericValues() {
-        const { begin, duration, position: { x, y } } = this.fireworkConfig;
-
-        this.validateNumericValue(begin, 'begin');
-        this.validateNumericValue(duration, 'duration');
-        this.validateNumericValue(x, 'position.x');
-        this.validateNumericValue(y, 'position.y');
-    }
-
-    create() {
+    constructor(container, fireworkConfig, restartTime = false) {
+        super(container, fireworkConfig, restartTime);
         try {
             const emitterConfig = this.createEmitterConfig();
             this.emitter = new PIXI.particles.Emitter(this.container, emitterConfig);
-            this.startParticleEffect();
         } catch (error) {
-            console.error("Error creating firework:", error.message);
+            console.error("Error creating fountain Emitter:", error.message);
         }
-    }
-
-    startParticleEffect() {
-        const update = () => {
-            requestAnimationFrame(update);
-            const currentTime = Date.now();
-            if (currentTime >= this.startTime) {
-                this.emitter.update((currentTime - this.startTime) * 0.001);
-                this.startTime = currentTime;
-            }
-        };
-
-        update();
     }
 
     createEmitterConfig() {
@@ -64,7 +38,10 @@ export default class Fountain extends Firework {
         };
     }
 
-    restartActions() {
-        this.emitter.playOnce();
+    update(currentTime) {
+        if (currentTime >= this.startTime) {
+            this.emitter.update((currentTime - this.startTime) * 0.001);
+            this.startTime = currentTime;
+        }
     }
 }

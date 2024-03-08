@@ -1,21 +1,12 @@
-
-import FireworkFactory from './fireworkFactory.js';
-
 export default class Firework {
-    constructor(container, fireworkConfig) {
+    constructor(container, fireworkConfig, restartTime = false) {
         this.container = container;
         this.fireworkConfig = fireworkConfig;
         this.validateParameters(container, fireworkConfig);
         this.checkPixiAvailability();
-        this.validateNumericValues();
         this.startTime = Date.now() + fireworkConfig.begin;
-        this.emitter = null;
-    }
 
-    validateNumericValue(value, paramName) {
-        if (isNaN(value)) {
-            throw new Error(`Invalid value for ${paramName}. Please provide a valid numeric value.`);
-        }
+        restartTime && setTimeout(() => this.restart(restartTime), restartTime);
     }
 
     validateParameters(container, fireworkConfig) {
@@ -30,28 +21,17 @@ export default class Firework {
         }
     }
 
-    checkTickerAvailability() {
-        if (!this.ticker || typeof this.ticker.start !== 'function') {
-            throw new Error("Ticker is not available or does not have a start function.");
-        }
-    }
-
-    validateNumericValues() {
+    update() {
         // Implement this method in the subclasses
     }
 
-    create() {
-        // Implement this method in the subclasses
-    }
-
-    createEmitterConfig() {
-        // Implement this method in the subclasses
-    }
-
-    restart() {
+    restart(restartTime = false) {
         try {
             this.startTime = Date.now() + this.fireworkConfig.begin;
+            this.emitter.playOnce()
             this.restartActions();
+            
+            restartTime && setTimeout(() => this.restart(restartTime), restartTime);
         } catch (error) {
             console.error("Error restarting firework:", error.message);
         }
