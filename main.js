@@ -9,7 +9,7 @@ export default class MainApp {
             this.app = new PIXI.Application({ backgroundColor: 0x000000, width: 1024, height: 768 });
             document.body.appendChild(this.app.view);
             this.container = this.createContainer();
-            this.createCounters();
+            // this.createCounters();
 
             document.addEventListener("DOMContentLoaded", () => this.startApp());
         } catch (error) {
@@ -34,37 +34,38 @@ export default class MainApp {
 
     createFireworks(fireworksData) {
         try {
-            fireworksData.forEach(fireworkData => {
-                this.fireworksInstances.push(FireworkFactory.createFirework(this.container, fireworkData));
-            });
+            this.fireworksInstances = fireworksData.map(fireworkData => FireworkFactory.createFirework(this.container, fireworkData));
         } catch (error) {
-            console.error("Error creating fireworks: ", error.message);
+            console.error("Error creating fireworks:", error.message);
         }
     }
 
     updateFireworks() {
         try { 
+            let lastUpdateTime = 0;
+            const frameRate = 60;
             const update = () => {
                 const currentTime = Date.now();
-                this.fireworksInstances.forEach((instance) => {
-                    instance.update(currentTime);
-                });
+                const elapsed = currentTime - lastUpdateTime;
+
+                if (elapsed > 1000 / frameRate) {
+                    this.fireworksInstances.forEach(instance => instance.update(currentTime));
+                    lastUpdateTime = currentTime;
+                }
                 requestAnimationFrame(update);
-            };
+            }
             update();
         } catch (error) {
-            console.error("Error updating fireworks: " + error.message);
+            console.error("Error updating fireworks:", error.message);
         }
     }
     
     restartFireworks(totalDuration) {
         try { 
-            this.fireworksInstances.forEach((instance) => {
-                instance.restart();
-            });
+            this.fireworksInstances.forEach(instance => instance.restart(totalDuration));
             setTimeout(() => this.restartFireworks(totalDuration), totalDuration);
         } catch (error) {
-            console.error("Error restarting fireworks: " + error.message);
+            console.error("Error restarting fireworks:", error.message);
         }
     }
 
