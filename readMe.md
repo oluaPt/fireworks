@@ -1,4 +1,4 @@
-[Check it working here](https://fireworkspixi.playcode.io/)
+[Check it working here](https://fireworkspixi.playcode.io/) (skip intro)
 &nbsp;
 &nbsp;
 
