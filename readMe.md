@@ -1,4 +1,4 @@
-[Check it working here](https://fireworkspixi.playcode.io/){:target="_blank"}  
+[Check it working here](https://fireworkspixi.playcode.io/)
 &nbsp;
 &nbsp;
 
