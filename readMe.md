@@ -22,12 +22,12 @@
    5. **`fountain.js`:**
       - Specialized class extending `Firework`.
       - Generates fountain-type fireworks using PIXI particles.
-      - Implements specific validation, creation, and restarting functionality.
+      - Implements specific validation, creation, update, and restarting functionality.
 
    6. **`rocket.js`:**
       - Specialized class extending `Firework`.
-      - Generates rocket-type fireworks with PIXI particles and animation using PIXI Ticker.
-      - Implements specific validation, creation, and restarting functionality.
+      - Generates rocket-type fireworks with PIXI particles and sprite.
+      - Implements specific validation, creation, update and restarting functionality.
 
    7. **`fireworks.xml`:**
       - XML file specifying detailed firework configurations.
