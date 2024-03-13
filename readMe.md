@@ -1,3 +1,7 @@
+Check it working here: [https://fireworkspixi.playcode.io/](https://fireworkspixi.playcode.io/)  
+&nbsp;
+&nbsp;
+
 - **File Structure:**
    1. **`main.js`:**
       - Orchestrates the fireworks display.
