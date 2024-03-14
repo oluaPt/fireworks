@@ -2,7 +2,8 @@
 * Code version: [here](https://playcode.io/fireworkspixi/)
 * Published version: [here](https://fireworkspixi.playcode.io/) (skip intro)
 
-- **File Structure:**
+
+## File Structure:
    1. **`main.js`:**
       - Orchestrates the fireworks display.
       - Initializes PIXI.js application and manages the overall flow.
