@@ -2,8 +2,10 @@
 * Code version: [here](https://playcode.io/fireworkspixi/)
 * Published version: [here](https://fireworkspixi.playcode.io/) (skip intro)
 
+# Pixi.js Fireworks Animation
+This exercise demonstrates the capabilities of Pixi.js, a versatile 2D rendering engine, combined with the Pixi Emitter to create an interactive set of fireworks animations.
 
-## File Structure:
+## File Structure
    1. **`main.js`:**
       - Orchestrates the fireworks display.
       - Initializes PIXI.js application and manages the overall flow.
@@ -38,6 +40,6 @@
       - XML file specifying detailed firework configurations.
       - Defines attributes such as type, color, position, velocity, and duration for each firework.
 
-- **Usage:**
+### Usage
    - The application must be hosted on a web server to address CORS issues.
    - Customize the fireworks display by adjusting parameters in `fireworks.xml`.
