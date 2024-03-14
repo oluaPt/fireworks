@@ -1,6 +1,6 @@
-[Check it working here](https://fireworkspixi.playcode.io/) (skip intro)
-&nbsp;
-&nbsp;
+## Check it on Playcode.io
+* Code version: [here](https://playcode.io/fireworkspixi/)
+* Published version: [here](https://fireworkspixi.playcode.io/) (skip intro)
 
 - **File Structure:**
    1. **`main.js`:**
